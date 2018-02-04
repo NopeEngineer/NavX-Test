@@ -7,6 +7,7 @@
 
 package org.usfirst.frc.team2509.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -42,17 +43,17 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	
 	static final double kToleranceDegrees = 2.0f;
 	
-	Talon DriveTrain_left1 = new Talon(0);
+	WPI_TalonSRX DriveTrain_left1 = new WPI_TalonSRX(0);
 	
-	Talon DriveTrain_left2 = new Talon(2);
+	WPI_TalonSRX DriveTrain_left2 = new WPI_TalonSRX(2);
 	
-	Talon DriveTrain_left3 = new Talon(1);
+	WPI_TalonSRX DriveTrain_left3 = new WPI_TalonSRX(1);
 	
-	Talon DriveTrain_right1 = new Talon(3);
+	WPI_TalonSRX DriveTrain_right1 = new WPI_TalonSRX(3);
 	
-	Talon DriveTrain_right2 = new Talon(4);
+	WPI_TalonSRX DriveTrain_right2 = new WPI_TalonSRX(4);
 	
-	Talon DriveTrain_right3 = new Talon(5);
+	WPI_TalonSRX DriveTrain_right3 = new WPI_TalonSRX(5);
 	
 	SpeedControllerGroup DriveTrain_Left = new SpeedControllerGroup(
 			DriveTrain_left1,DriveTrain_left2,DriveTrain_left3);
