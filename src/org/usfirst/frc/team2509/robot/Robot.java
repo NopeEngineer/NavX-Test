@@ -117,9 +117,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		ahrs.reset();
 		while  (isAutonomous());
 			ahrs.getAngle();
-			drive.arcadeDrive(-1.0, kP);
-			Timer.delay(0.005);
-			drive.arcadeDrive(0.0, 0.0);
+			turnController.setSetpoint(90.0f);
+           boolean rotateToAngle = true;
+            
 	}
 
 	
@@ -153,6 +153,19 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	         
 	          if ( stick.getRawButton(1)) {  //this is just to zero the gyro so you don't have to restart code every time
 	              ahrs.reset();
+	          }
+	          if ( stick.getRawButton(2)) {
+	              turnController.setSetpoint(0.0f);
+	              rotateToAngle = true;
+	          } else if ( stick.getRawButton(3)) {
+	              turnController.setSetpoint(90.0f);
+	              rotateToAngle = true;
+	          } else if ( stick.getRawButton(4)) {
+	              turnController.setSetpoint(179.9f);
+	              rotateToAngle = true;
+	          } else if ( stick.getRawButton(5)) {
+	              turnController.setSetpoint(-90.0f);
+	              rotateToAngle = true;
 	          }
 	          double currentRotationRate;
 	          if ( rotateToAngle ) {
