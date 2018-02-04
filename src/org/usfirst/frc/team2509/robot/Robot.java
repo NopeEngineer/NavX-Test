@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -41,7 +42,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	static final double kD = 0.00;
 	static final double kF = 0.00;
 	
-	static final double kToleranceDegrees = 2.0f;
+	
+	static final double kToleranceDegrees = 5.0f;
 	
 	WPI_TalonSRX DriveTrain_left1 = new WPI_TalonSRX(0);
 	
@@ -82,63 +84,44 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		
 		turnController = new PIDController(kP, kI, kD, ahrs, this);
 		turnController.setInputRange(-180.0f, 180.0f);
-		turnController.setOutputRange(-1.0, 1.0);
+		turnController.setOutputRange(-0.5, 0.5);
 		turnController.setAbsoluteTolerance(kToleranceDegrees);
 		turnController.setContinuous(true);
 		
+		SmartDashboard.putNumber(   "RawGyro_X",            ahrs.getRawGyroX());
+        SmartDashboard.putNumber(   "RawGyro_Y",            ahrs.getRawGyroY());
+        SmartDashboard.putNumber(   "RawGyro_Z",            ahrs.getRawGyroZ());
+        SmartDashboard.putNumber(   "RawAccel_X",           ahrs.getRawAccelX());
+        SmartDashboard.putNumber(   "RawAccel_Y",           ahrs.getRawAccelY());
+        SmartDashboard.putNumber(   "RawAccel_Z",           ahrs.getRawAccelZ());
+		
+	  
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 	}
 
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString line to get the auto name from the text box below the Gyro
-	 *
-	 * <p>You can add additional auto modes by adding additional comparisons to
-	 * the switch structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
 	@Override
 	public void autonomousInit() {
-		m_autoSelected = m_chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
-		
-		drive.setSafetyEnabled(false);
-		turnController.setSetpoint(90f); //turns to 90 degrees for test purposes
-		
-		//OK, I'm  of bored right now so I'm gonna try and make this drive straight
-		
-		ahrs.reset();
-		while  (isAutonomous());
-			ahrs.getAngle();
-			turnController.setSetpoint(90.0f);
-           boolean rotateToAngle = true;
-            
+		drive.setSafetyEnabled(true);
+		while(ahrs.getAngle()<2.5&&ahrs.getAngle()>-2.5) {
+			SmartDashboard.putNumber("Gyro", ahrs.getAngle());
+	        boolean rotateToAngle = false;
+	        turnController.setSetpoint(0.0f);
+	        rotateToAngle = true;
+	        double currentRotationRate;
+	        turnController.enable();
+	        currentRotationRate = rotateToAngleRate;
+	        drive.arcadeDrive(0, currentRotationRate);
+		}
+		drive.arcadeDrive(0, 0);
 	}
-
-	
-	
 
 	/**
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
-			case kCustomAuto:
-				// Put custom auto code here
-				break;
-			case kDefaultAuto:
-			default:
-				// Put default auto code here
-				break;
-		}
 	}
 
 	/**
@@ -146,9 +129,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 */
 	@Override
 	public void teleopPeriodic() {
-		 
+		SmartDashboard.putData("PID Controller",turnController);
 		drive.setSafetyEnabled(true);
 	      while (isOperatorControl() && isEnabled()) {
+	    	  SmartDashboard.putNumber("Gyro", ahrs.getAngle());
 	          boolean rotateToAngle = false;
 	         
 	          if ( stick.getRawButton(1)) {  //this is just to zero the gyro so you don't have to restart code every time
@@ -168,6 +152,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	              rotateToAngle = true;
 	          }
 	          double currentRotationRate;
+	          
 	          if ( rotateToAngle ) {
 	              turnController.enable();
 	              currentRotationRate = rotateToAngleRate;
@@ -175,6 +160,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	              turnController.disable();
 	              currentRotationRate = stick.getTwist();
 	          }
+	          drive.arcadeDrive(0, currentRotationRate);
+	          
 	      }
 	}
 
@@ -183,6 +170,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 */
 	@Override
 	public void testPeriodic() {
+		
 	}
 
 	@Override
